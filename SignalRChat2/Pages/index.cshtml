@@ -1,0 +1,230 @@
+﻿@page
+@model SignalRChat2.Pages.testModel
+@{
+    ViewData["Title"] = "test";
+}
+
+Select your color:
+<input type="color" id="myColor">
+<br />
+<input type="button" id="sendButton" value="End Turn" />
+<input type="button" id="resetButton" value="Start/Reset" />
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<div id="container"></div>
+<script>
+
+
+    document.createSvg = function (tagName) {
+        var svgNS = "http://www.w3.org/2000/svg";
+        return this.createElementNS(svgNS, tagName);
+    };
+
+    //var numberPerSide = 20;
+    //var size = 10;
+    //var pixelsPerSide = 400;
+
+
+    //board----------
+    board = [];
+
+
+    //board[3].life = 3;
+
+    //document.write(board[3].life);
+    //----------
+
+
+
+    //json----
+    json = '[{"life":0,"color":"#000000"},{"life":0,"color":"#000000"}]'
+    //const obj = JSON.parse(json);
+    //const obj = JSON.parse(jsonString);
+    //for (var i = 0; i < obj.length; i++) {
+    //    document.write(obj[i].color);
+    //}
+
+    //----------
+
+
+    //global board
+
+    //grid
+    var grid = function (numberPerSide, size, pixelsPerSide, json) {
+        var svg = document.createSvg("svg");
+        board = JSON.parse(json);
+        svg.setAttribute("width", pixelsPerSide);
+        svg.setAttribute("height", pixelsPerSide);
+        svg.setAttribute("viewBox", [0, 0, numberPerSide * size, numberPerSide * size].join(" "));
+
+        for (var i = 0; i < numberPerSide; i++) {
+            for (var j = 0; j < numberPerSide; j++) {
+
+                
+
+                //var color1 = colors[(i + j) % colors.length];
+                //var color2 = colors[(i + j + 1) % colors.length];
+                var g = document.createSvg("g");
+                g.setAttribute("transform", ["translate(", j * size, ",", i * size, ")"].join(""));
+                var number = numberPerSide * i + j;
+                var box = document.createSvg("rect");
+                box.setAttribute("width", size);
+                box.setAttribute("height", size);
+
+                //make it 16x16 with this if:
+                if (number > 18 && number < 18 * 17 && !(number % 18 == 0 || number % 18 == 17)) {
+                    //document.write(board[number].color);
+
+                    box.setAttribute("fill", board[number].color);
+
+                    //box.setAttribute("fill", "red");
+
+                    //box.style.fill = "white";
+                    box.style.stroke = "black";
+
+                    box.setAttribute("id", "b" + number);
+                    g.appendChild(box);
+                    var text = document.createSvg("text");
+                    //text.appendChild(document.createTextNode(i * numberPerSide + j));
+                    //text.setAttribute("fill", color2);
+                    text.setAttribute("font-size", 6);
+                    text.setAttribute("x", 0);
+                    text.setAttribute("y", size / 2);
+                    text.setAttribute("id", "t" + number);
+                    g.appendChild(text);
+                    svg.appendChild(g);
+                }
+
+                
+            }
+        }
+        svg.addEventListener(
+            "click",
+            function (e) {
+                var id = e.target.id;
+                var c = document.getElementById("myColor").value;
+                obj = document.getElementById(id);
+                objColor = obj.getAttribute("fill");
+
+                //alert(typeof (c));
+                //alert(objColor == c);
+                //alert(objColor + ":" + c);
+                //alert(id);
+
+                if (objColor == c) {
+                    obj.setAttribute("fill", "#ffffff");
+                    board[id.substring(1)].color = "#ffffff";
+                    board[id.substring(1)].life = 0;
+
+                } else {
+                    obj.setAttribute("fill", c)
+                    board[id.substring(1)].color = c;
+                    board[id.substring(1)].life = 1;
+                }
+
+
+                //if (id)
+                //    alert(id.substring(1));
+            },
+            false);
+        return svg;
+    };
+
+ 
+
+
+
+    var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+
+    //Disable send button until connection is established
+    document.getElementById("sendButton").disabled = true;
+
+    connection.on("ReceiveMessage", function (jsonString) {
+
+        //board is 1d array of json objects, each object will have
+        //two items: if the cell is on or off and the color
+
+        //receive the board in json format
+
+        //deserialize board
+
+        //render the board
+
+
+        //deserilize json
+        board = JSON.parse(jsonString);
+
+        
+        //build board
+        var container = document.getElementById("container");
+        
+        while (container.firstChild) {
+            container.removeChild(container.lastChild);
+        }
+
+        container.appendChild(grid(18, 10, 600, jsonString));
+
+
+
+    });
+
+    connection.start().then(function () {
+        document.getElementById("sendButton").disabled = false;
+    }).catch(function (err) {
+        return console.error(err.toString());
+    });
+
+    document.getElementById("sendButton").addEventListener("click", function (event) {
+
+
+        //board is 1d array of json objects, each object will have
+        //two items: if the cell is on or off and the color
+
+        //serialize the board into json
+        var jsonString = JSON.stringify(board, ["life", "color"]);
+        
+        //send the board to the server:
+        connection.invoke("SendMessage2", jsonString).catch(function (err) {
+            return console.error(err.toString());
+        });
+        event.preventDefault();
+    });
+
+    class cell {
+        life;
+        color;
+        constructor(life, color) {
+            this.life = life;
+            this.color = color;
+        }
+    }
+
+    document.getElementById("resetButton").addEventListener("click", function (event) {
+
+        var container = document.getElementById("container");
+
+        while (container.firstChild) {
+            container.removeChild(container.lastChild);
+        }
+        
+        for (var i = 0; i < 18 * 18; i++) {
+            board[i] = new cell(0, "#ffffff");
+        }
+
+        //board[5].color = "#555555";
+
+        var jsonString = JSON.stringify(board, ["life", "color"]);
+
+        //display gameboard
+        var container = document.getElementById("container");
+        container.appendChild(grid(18, 10, 600, jsonString));;
+    });
+
+
+
+</script>
+
+
+
+
+
+

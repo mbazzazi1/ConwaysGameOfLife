@@ -85,63 +85,81 @@ namespace SignalRChat2.Hubs
             return avgColor;
         }
 
-        public string addHexColor(string v1, string v2)
+        public int[] addHexColor(int[] v1, int[] v2)
         {
-            int red1 = int.Parse(v1.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
-            int green1 = int.Parse(v1.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
-            int blue1 = int.Parse(v1.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+            //int red1 = int.Parse(v1.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+            //int green1 = int.Parse(v1.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+            //int blue1 = int.Parse(v1.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
 
-            int red2 = int.Parse(v2.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
-            int green2 = int.Parse(v2.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
-            int blue2 = int.Parse(v2.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+            //int red2 = int.Parse(v2.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+            //int green2 = int.Parse(v2.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+            //int blue2 = int.Parse(v2.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
 
-            string addColor = "#" + (red1 + red2).ToString("X2") + (green1 + green2).ToString("X2") + (blue1 + blue2).ToString("X2");
+            //string addColor = "#" + (red1 + red2).ToString("X2") + (green1 + green2).ToString("X2") + (blue1 + blue2).ToString("X2");
+            int[] addColor = { (v1[0] + v2[0]), (v1[1] + v2[1]), (v1[2] + v2[2]) };
             return addColor;
         }
 
 
-        public string divHexColor(string v1, int count)
+        public string divHexColor(int[] a1, int count)
         {
             if (count > 0)
             {
-                int red1 = int.Parse(v1.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
-                int green1 = int.Parse(v1.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
-                int blue1 = int.Parse(v1.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
 
-                string divColor = "#" + (red1 / count).ToString("X2") + (green1 / count).ToString("X2") + (blue1 / count).ToString("X2");
+                //int red1 = int.Parse(v1.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+                //int green1 = int.Parse(v1.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+                //int blue1 = int.Parse(v1.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+
+                string divColor = "#" + (a1[0] / count).ToString("X2") + (a1[1] / count).ToString("X2") + (a1[2] / count).ToString("X2");
                 return divColor;
             } else
             {
-                return v1;
+                return "#" + a1[0].ToString("X2") + a1[1].ToString("X2") + a1[2].ToString("X2");
             }
-
-            
         }
 
+
+        public int[] colorHexToIntArray(string v1)
+        {
+
+            int red1 = int.Parse(v1.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+            int green1 = int.Parse(v1.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+            int blue1 = int.Parse(v1.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+
+            int[] intColor = { red1, green1, blue1 };
+
+            return intColor;
+
+        }
+
+
         ///receive board, and index of cell return count of horizontal live cells
-        public string[] horCheck(cell[] board, int i)
+        public int[] horCheck(cell[] board, int i)
         {
             int count = 0;
-            
+
             //if (board[i].life == 1) { string hexColor = board[i].color; }
             //string[] hexArr = new string[2];
-            string hexColor = "#000000";
+            //string hexColor = "#000000";
+            int[] hexColor = { 00, 00, 00 };
             
             if (board[i + 1].life == 1)
             {
                 count++;
 
                 //hexArr[0] = board[i + 1].color;
-                hexColor = addHexColor(board[i + 1].color, hexColor);
+                hexColor = addHexColor(colorHexToIntArray(board[i + 1].color), hexColor);
             }
             if (board[i - 1].life == 1)
             {
-                hexColor = addHexColor(board[i - 1].color, hexColor);
+                hexColor = addHexColor(colorHexToIntArray(board[i - 1].color), hexColor);
                 //hexArr[1] = board[i + 1].color;
                 //hexColor = avgHexColor(board[i - 1].color, hexColor);
                 count++;
             }
-            string[] retArr = { count.ToString(), hexColor };
+            int[] retArr = new int[hexColor.Length + 1];
+            hexColor.CopyTo(retArr, 1);
+            retArr[0] = count;
             return retArr;
         }
 
@@ -150,59 +168,77 @@ namespace SignalRChat2.Hubs
 
 
         ///return a count of how many vertical cells are live
-        public string[] vertCheck(cell[] board, int i)
+        public int[] vertCheck(cell[] board, int i)
         {
             int count = 0;
             //string hexColor = board[i].color;
-            string hexColor = "#000000";
+            //string hexColor = "#000000";
+            int[] hexColor = { 00, 00, 00 };
             if (board[i + 18].life == 1)
             {
-                hexColor = addHexColor(board[i + 18].color, hexColor);
+                hexColor = addHexColor(colorHexToIntArray(board[i + 18].color), hexColor);
+                //hexColor = addHexColor(board[i + 18].color, hexColor);
                 //hexColor = avgHexColor(board[i + 18].color, hexColor);
                 count++;
             }
             if (board[i - 18].life == 1)
             {
-                hexColor = addHexColor(board[i - 18].color, hexColor);
+                hexColor = addHexColor(colorHexToIntArray(board[i - 18].color), hexColor);
+                //hexColor = addHexColor(board[i - 18].color, hexColor);
                 //hexColor = avgHexColor(board[i - 18].color, hexColor);
                 count++;
             }
-            string[] retArr = { count.ToString(), hexColor };
+            //string[] retArr = { count.ToString(), hexColor };
+
+
+            int[] retArr = new int[hexColor.Length + 1];
+            hexColor.CopyTo(retArr, 1);
+            retArr[0] = count;
             return retArr;
+
+            //return retArr;
         }
 
         ///check if two cells are diagnoally adjacent
 
-        public string[] diagCheck(cell[] board, int i)
+        public int[] diagCheck(cell[] board, int i)
         {
             int count = 0;
-            string hexColor = "#000000";
+            //string hexColor = "#000000";
+            int[] hexColor = { 00, 00, 00 };
             //string hexColor = board[i].color;
             if (board[i + 19].life == 1)
             {
-                hexColor = addHexColor(board[i + 19].color, hexColor);
+                hexColor = addHexColor(colorHexToIntArray(board[i + 19].color), hexColor);
+                //hexColor = addHexColor(board[i + 19].color, hexColor);
                 //hexColor = avgHexColor(board[i + 19].color, hexColor);
                 count++;
             }
             if (board[i + 17].life == 1)
             {
-                hexColor = addHexColor(board[i + 17].color, hexColor);
+                hexColor = addHexColor(colorHexToIntArray(board[i + 17].color), hexColor);
+                //hexColor = addHexColor(board[i + 17].color, hexColor);
                 //hexColor = avgHexColor(board[i + 17].color, hexColor);
                 count++;
             }
             if (board[i - 19].life == 1)
             {
-                hexColor = addHexColor(board[i - 19].color, hexColor);
+                hexColor = addHexColor(colorHexToIntArray(board[i - 19].color), hexColor);
+                //hexColor = addHexColor(board[i - 19].color, hexColor);
                 //hexColor = avgHexColor(board[i - 19].color, hexColor);
                 count++;
             }
             if (board[i - 17].life == 1)
             {
-                hexColor = addHexColor(board[i - 17].color, hexColor);
+                hexColor = addHexColor(colorHexToIntArray(board[i - 17].color), hexColor);
+                //hexColor = addHexColor(board[i - 17].color, hexColor);
                 //hexColor = avgHexColor(board[i - 17].color, hexColor);
                 count++;
             }
-            string[] retArr = { count.ToString(), hexColor };
+            int[] retArr = new int[hexColor.Length + 1];
+            hexColor.CopyTo(retArr, 1);
+            retArr[0] = count;
+            
             return retArr;
         }
 
@@ -231,28 +267,38 @@ namespace SignalRChat2.Hubs
                     //1 Any live cell with two or three neighbors survives.
                     //2 Any dead cell with three live neighbors becomes a live cell.
                     //3 All other live cells die in the next generation.Similarly, all other dead cells stay dead
-
-                    string[] currArr = horCheck(board, x);
-                    int liveNeighbors = Int32.Parse(currArr[0]);
-                    string hexColor = currArr[1];
+                    int[] tempColor = new int[3];
+                    string strHexColor;
+                    int[] currArr = horCheck(board, x);
+                    int liveNeighbors = currArr[0];
+                    int[] hexColor = { currArr[1], currArr[2], currArr[3] };
 
                     currArr = vertCheck(board, x);
-                    liveNeighbors += Int32.Parse(currArr[0]);
-                    hexColor = addHexColor(currArr[1], hexColor);
+                    liveNeighbors += currArr[0];
+                    tempColor[0] = currArr[1];
+                    tempColor[1] = currArr[2];
+                    tempColor[2] = currArr[3];
+
+                    hexColor = addHexColor(tempColor, hexColor);
 
                     currArr = diagCheck(board, x);
-                    liveNeighbors += Int32.Parse(currArr[0]);
-                    hexColor = addHexColor(currArr[1], hexColor);
+                    liveNeighbors += (currArr[0]);
+                    //hexColor = addHexColor(currArr[1], hexColor);
+                    tempColor[0] = currArr[1];
+                    tempColor[1] = currArr[2];
+                    tempColor[2] = currArr[3];
+                    hexColor = addHexColor(tempColor, hexColor);
                     //hexColor = avgHexColor(currArr[1], hexColor);
 
                     if (board[x].life == 1)
                     {
-                        hexColor = addHexColor(hexColor, board[x].color);
-                        hexColor = divHexColor(hexColor, liveNeighbors+1);
+                        hexColor = addHexColor(hexColor, colorHexToIntArray(board[x].color));
+
+                        strHexColor = divHexColor(hexColor, liveNeighbors+1);
                     }
                     else
                     {
-                        hexColor = divHexColor(hexColor, liveNeighbors);
+                        strHexColor = divHexColor(hexColor, liveNeighbors);
                     }
                     
 
@@ -268,7 +314,7 @@ namespace SignalRChat2.Hubs
                         {
                             //live cell stays alive
                             newBoard[x].life = 1;
-                            newBoard[x].color = hexColor;
+                            newBoard[x].color = strHexColor;
                         }
                         else
                         {
@@ -284,7 +330,7 @@ namespace SignalRChat2.Hubs
                         {
                             //becomes alive
                             newBoard[x].life = 1;
-                            newBoard[x].color = hexColor;
+                            newBoard[x].color = strHexColor;
                         }
                         else
                         {

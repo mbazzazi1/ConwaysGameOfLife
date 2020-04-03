@@ -7,7 +7,7 @@
 Select your color:
 <input type="color" id="myColor">
 <br />
-<input type="button" id="sendButton" value="End Turn" />
+<input type="button" id="sendButton2" value="End Turn" />
 <input type="button" id="resetButton" value="Start/Reset" />
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <div id="container"></div>
@@ -134,9 +134,10 @@ Select your color:
 
 
     var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+    //var connection = new signalR.HubConnectionBuilder().withUrl("http://students.cs.weber.edu/Group123/chatHub").build(); // Server setting var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build(); //local setting
 
     //Disable send button until connection is established
-    document.getElementById("sendButton").disabled = true;
+    document.getElementById("sendButton2").disabled = true;
 
     connection.on("ReceiveMessage", function (jsonString) {
 
@@ -168,12 +169,12 @@ Select your color:
     });
 
     connection.start().then(function () {
-        document.getElementById("sendButton").disabled = false;
+        document.getElementById("sendButton2").disabled = false;
     }).catch(function (err) {
         return console.error(err.toString());
     });
 
-    document.getElementById("sendButton").addEventListener("click", function (event) {
+    document.getElementById("sendButton2").addEventListener("click", function (event) {
 
 
         //board is 1d array of json objects, each object will have

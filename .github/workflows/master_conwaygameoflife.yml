@@ -31,5 +31,5 @@ jobs:
       with:
         app-name: 'conwaygameoflife'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_1e0bedc7467f41ac91c581392c31a4c5 }}
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_16a7d41c25ff4e31b09c2bc2d5c530aa }}
         package: ${{env.DOTNET_ROOT}}/myapp 
